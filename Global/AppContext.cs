@@ -2,6 +2,7 @@ using ISO11820.Core;
 using ISO11820.Data;
 using ISO11820.Services;
 using Microsoft.Extensions.Configuration;
+using PdfSharp.Fonts;
 using Serilog;
 
 namespace ISO11820.Global;
@@ -49,6 +50,9 @@ public class AppRuntime
     {
         var ctx = new AppRuntime(config);
         Instance = ctx;
+
+        // 0. 注册 PDF 字体解析器
+        GlobalFontSettings.FontResolver = new SystemFontResolver();
 
         // 1. 配置 Serilog 日志
         var logPath = Path.Combine(
