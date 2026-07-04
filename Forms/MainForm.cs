@@ -514,6 +514,12 @@ public class MainForm : Form
         UpdateStatusLabel();
         UpdateButtonStates();
 
+        // Complete 时同步 TotalTestTime
+        if (newStatus == TestStatus.Complete && _ctx.CurrentTest != null)
+        {
+            _ctx.CurrentTest.TotalTestTime = _ctx.Controller.ElapsedSeconds;
+        }
+
         // 状态切换消息
         string msg = newStatus switch
         {
@@ -754,8 +760,7 @@ public class MainForm : Form
     private void UpdateButtonStates()
     {
         bool hasActiveTest = _ctx.CurrentTest != null;
-        bool hasUnsaved = _ctx.CurrentTest != null && _ctx.CurrentTest.TotalTestTime > 0
-                          && _ctx.CurrentTest.Flag != "10000000";
+        bool hasUnsaved = _ctx.CurrentTest != null && _ctx.CurrentTest.Flag != "10000000";
 
         _btnNewTest.Enabled = _currentStatus switch
         {
