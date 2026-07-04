@@ -168,20 +168,22 @@ public class ExportService
         var page = document.AddPage();
         page.Size = PdfSharp.PageSize.A4;
         XGraphics gfx = XGraphics.FromPdfPage(page);
-        var fontTitle = new XFont("Microsoft YaHei", 18, XFontStyleEx.Bold);
-        var fontH2 = new XFont("Microsoft YaHei", 13, XFontStyleEx.Bold);
-        var fontNormal = new XFont("Microsoft YaHei", 10, XFontStyleEx.Regular);
-        var fontSmall = new XFont("Microsoft YaHei", 9, XFontStyleEx.Regular);
+        var fontTitle = new XFont("Arial", 18, XFontStyleEx.Bold);
+        var fontH2 = new XFont("Arial", 13, XFontStyleEx.Bold);
+        var fontNormal = new XFont("Arial", 10, XFontStyleEx.Regular);
+        var fontSmall = new XFont("Arial", 9, XFontStyleEx.Regular);
 
         double y = 40;
+        double pageW = page.Width.Point;
+        double pageH = page.Height.Point;
 
         // 标题
         gfx.DrawString("ISO 11820 建筑材料不燃性试验报告", fontTitle, XBrushes.Black,
-            new XRect(0, y, page.Width, 30), XStringFormats.TopCenter);
+            new XRect(0, y, pageW, 30), XStringFormats.TopCenter);
         y += 40;
 
         // 分隔线
-        gfx.DrawLine(XPens.Gray, 40, y, page.Width - 40, y);
+        gfx.DrawLine(XPens.Gray, 40, y, pageW - 40, y);
         y += 20;
 
         // 试验概要
@@ -211,12 +213,12 @@ public class ExportService
         DrawRow("火焰持续时间：", $"{test.FlameDuration} 秒");
 
         y += 10;
-        gfx.DrawLine(XPens.Gray, 40, y, page.Width - 40, y);
+        gfx.DrawLine(XPens.Gray, 40, y, pageW - 40, y);
         y += 20;
 
         // 判定结论
         bool passed = test.DeltaTf <= 50 && test.LostWeightPer <= 50 && test.FlameDuration < 5;
-        var resultFont = new XFont("Microsoft YaHei", 14, XFontStyleEx.Bold);
+        var resultFont = new XFont("Arial", 14, XFontStyleEx.Bold);
         var resultBrush = passed ? XBrushes.Green : XBrushes.Red;
         gfx.DrawString($"判定结论：{(passed ? "通过" : "不通过")}", resultFont, resultBrush, 50, y);
         y += 30;
@@ -231,7 +233,7 @@ public class ExportService
             try
             {
                 using var img = XImage.FromFile(chartImagePath);
-                double imgW = page.Width - 100;
+                double imgW = pageW - 100;
                 double imgH = img.PixelHeight * imgW / img.PixelWidth;
                 if (imgH > 300) { imgH = 300; imgW = img.PixelWidth * 300 / img.PixelHeight; }
                 gfx.DrawImage(img, 50, y, imgW, imgH);
@@ -244,7 +246,7 @@ public class ExportService
         }
 
         // 温度数据摘要表
-        gfx.DrawLine(XPens.Gray, 40, y, page.Width - 40, y);
+        gfx.DrawLine(XPens.Gray, 40, y, pageW - 40, y);
         y += 20;
 
         gfx.DrawString("温度数据摘要", fontH2, XBrushes.Black, 50, y);
@@ -253,7 +255,7 @@ public class ExportService
         // 表头
         string[] headers = { "时间(s)", "炉温1", "炉温2", "表面温", "中心温" };
         double[] colX = { 50, 120, 200, 280, 360 };
-        double colW = (page.Width - 100) / 5;
+        double colW = (pageW - 100) / 5;
 
         for (int i = 0; i < headers.Length; i++)
         {
@@ -273,7 +275,7 @@ public class ExportService
                 y += 14;
 
                 // 换页检查
-                if (y > page.Height - 50)
+                if (y > pageH - 50)
                 {
                     y = 40;
                     page = document.AddPage();
