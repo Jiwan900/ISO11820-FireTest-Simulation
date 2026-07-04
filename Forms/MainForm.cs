@@ -694,7 +694,15 @@ public class MainForm : Form
             {
                 string excelPath = _ctx.Exporter.ExportExcel(saved, csvLines, baseDir);
                 AddSystemMessage($"Excel报告已生成：{excelPath}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Excel报告生成失败");
+                AddSystemMessage($"Excel报告失败：{ex.Message}\n{ex.StackTrace?.Split('\n').FirstOrDefault() ?? ""}", Color.Red);
+            }
 
+            try
+            {
                 if (_ctx.Configuration.GetValue<bool>("Report:EnablePdfExport", true))
                 {
                     string pdfPath = _ctx.Exporter.ExportPdf(saved, csvLines, baseDir);
@@ -703,8 +711,8 @@ public class MainForm : Form
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "报告生成失败");
-                AddSystemMessage($"报告生成失败：{ex.Message}", Color.Red);
+                Log.Error(ex, "PDF报告生成失败");
+                AddSystemMessage($"PDF报告失败：{ex.Message}", Color.Red);
             }
 
             _ctx.Controller.AfterSaveReturnToPreparing();
